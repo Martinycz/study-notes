@@ -1,0 +1,34 @@
+# Sort categorical columns in a geom_bar chart
+
+## Problem
+
+I was trying to draw a bar chart that shows the scores of a group of people in an ascendent order. Then I got a trouble.
+Even if I tried to sort the data frame by the score variable, the order of the bars on the chart doesn't change. Why?
+
+## Cause
+
+It turned out that ggplot takes the order of the factor levels. Sorting the data won't work if the factor levels remain same.
+A quick remedy is to use reorder() function to adjust the orders of the factorial variable. 
+
+## Code Example
+
+library("ggplot2")
+
+name <- c("Tom","Jerry","Mary")
+score <- c(68,45,92)
+dat <- data.frame(name, score)
+
+ggplot(data=dat, aes(name,score)) + geom_bar(stat="identity")     # initial display of the unordered data
+
+# Now I am going to sort out the dat data by score
+dat <- dat[order(dat$score),]
+head(dat)                                                         # the data set has been reordered
+
+# Execute ggplot again ... nothing happens
+ggplot(data=dat, aes(name,score)) + geom_bar(stat="identity")
+
+# As discovered, the levels of factorial variable have to be reordered
+dat$name <- reorder(dat$name, dat$score)                          # this only changes of the order of factor levels but not data's
+
+# Run ggplot to check the result. This time it works well.
+ggplot(data=dat, aes(name,score)) + geom_bar(stat="identity")
